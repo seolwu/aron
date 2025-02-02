@@ -1,4 +1,6 @@
-import { Suspense, useMemo } from 'react'
+'use client'
+
+import { Suspense } from 'react'
 import dayjs from 'dayjs'
 import { Image as ImageIcon, ExternalLink, Trash2, ClipboardCopy } from 'lucide-react'
 import { toast } from 'react-toastify'

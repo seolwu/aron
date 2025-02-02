@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useMemo, useState } from 'react'
 import { useEffect } from 'react'
 import { provideYouTube, YouTubeURLRegex, FileURLRegex, provideFileFormat } from '@/utils'
