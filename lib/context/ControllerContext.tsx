@@ -1,3 +1,5 @@
+'use client'
+
 import { FocusEvent, RefObject, useCallback, useEffect, useRef } from 'react'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'

@@ -1,3 +1,5 @@
+'use client'
+
 import { v4 } from 'uuid'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'

@@ -1,4 +1,7 @@
+'use client'
+
 import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { toast } from 'react-toastify'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
@@ -7,8 +10,9 @@ import { cn, hasNullValue as nv } from '@/utils'
 import { updateModels } from '@/utils/indexeddb'
 import { Model, ProviderFunctional, Providers } from '@/types'
 import { Library } from '@/types/database'
-import ModelItem from '@/components/ModelItem'
 import { KeyEvent, useKeys } from './KeyboardComboContext'
+
+const ModelItem = dynamic(() => import('@/components/ModelItem'), { ssr: false })
 
 type State = {
   baseLibraryRef: RefObject<HTMLInputElement>,
