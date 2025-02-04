@@ -1,22 +1,13 @@
-'use client'
-
 import { Suspense } from 'react'
+import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 import { Image as ImageIcon, ExternalLink, Trash2, ClipboardCopy } from 'lucide-react'
-import { toast } from 'react-toastify'
+import { AnimatePresence, motion } from 'motion/react'
 import { cn } from '@/utils'
-import { Model } from '@/types'
 import Info from '@/components/ModelInfo'
 import ActionButton from '@/components/ActionButton'
 import Thumbnail from '@/components/Thumbnail'
-import { AnimatePresence, motion } from 'motion/react'
-
-interface Props {
-  onOpen?: () => void
-  onCopy?: () => void
-  onDelete?: () => void
-  onThumbnailInteract?: () => void
-}
+import { ModelItemProps } from '@/types/component'
 
 const Skeleton: React.FC = () => {
   return (
@@ -51,7 +42,7 @@ const Skeleton: React.FC = () => {
   )
 }
 
-const Item: React.FC<Props & { model: Model }> = ({
+const Item: React.FC<ModelItemProps> = ({
   model,
   onOpen,
   onCopy,
@@ -154,7 +145,9 @@ const Item: React.FC<Props & { model: Model }> = ({
                     rounded cursor-pointer transition-all
                   `}
                   onClick={() => {
-                    onOpen && onOpen()
+                    if (onOpen) {
+                      onOpen()
+                    }
                     openInNewWindow(model.videoInfo.url)
                   }}
                 >
@@ -169,7 +162,9 @@ const Item: React.FC<Props & { model: Model }> = ({
                     rounded cursor-pointer transition-all
                   `}
                   onClick={() => {
-                    onCopy && onCopy()
+                    if (onCopy) {
+                      onCopy()
+                    }
                     copyToClipboard(model.videoInfo.url)
                   }}
                 >
@@ -183,7 +178,11 @@ const Item: React.FC<Props & { model: Model }> = ({
                     hover:bg-error/45 hover:border-error/80
                     rounded cursor-pointer transition-all
                   `}
-                  onClick={() => onDelete && onDelete()}
+                  onClick={() => {
+                    if (onDelete) {
+                      onDelete()
+                    }
+                  }}
                 >
                   <Trash2 className='w-5 lg:w-4 h-5 lg:h-4' />
                 </ActionButton>

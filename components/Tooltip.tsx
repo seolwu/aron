@@ -1,9 +1,6 @@
 import { useState } from 'react'
 import { cn } from '@/utils'
-
-interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  [key: string]: any
-}
+import { Props } from '@/types/component'
 
 interface TooltipProps {
   tooltip: React.ReactNode

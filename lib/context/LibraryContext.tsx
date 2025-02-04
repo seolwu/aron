@@ -5,17 +5,17 @@ import dynamic from 'next/dynamic'
 import { toast } from 'react-toastify'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import KeyboardEventHandler from 'react-keyboard-event-handler'
 import { cn, hasNullValue as nv } from '@/utils'
 import { updateModels } from '@/utils/indexeddb'
 import { Model, ProviderFunctional, Providers } from '@/types'
 import { Library } from '@/types/database'
 import { KeyEvent, useKeys } from './KeyboardComboContext'
 
+const KeyboardEventHandler = dynamic(() => import('react-keyboard-event-handler'), { ssr: false })
 const ModelItem = dynamic(() => import('@/components/ModelItem'), { ssr: false })
 
 type State = {
-  baseLibraryRef: RefObject<HTMLInputElement>,
+  baseLibraryRef: RefObject<HTMLDivElement | null>
   currentLibrary: Library
   libraries: Library[]
   libraryModels: Model[]
@@ -24,7 +24,7 @@ type State = {
   libraryModelsPerPage: number
   libraryPageCount: number
   playerSource: string | null
-  setBaseLibraryRef: (ref: RefObject<any>) => void,
+  setBaseLibraryRef: (ref: RefObject<HTMLDivElement  | null>) => void
   setCurrentLibrary: (value: Library) => void
   setLibraries: (value: Library[]) => void
   setLibraryModels: (value: Model[]) => void
@@ -81,7 +81,7 @@ export const useLibrary = create<State>()(
       })
     },
     requestToProvider: async (namespace, functional, value) => {
-      var response = await functional.callback(value, namespace)
+      const response = await functional.callback(value, namespace)
       set(state => {
         if (response) {
           const { data: model } = response
@@ -215,12 +215,12 @@ const Trigger: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className }) 
     event.preventDefault()
     const newPage = currentPage - 1
     if (newPage > 0) paginate(newPage)
-  }, [currentPage, maxPage])
+  }, [currentPage, paginate])
   const toNext = useCallback<KeyEvent>((_, event) => {
     event.preventDefault()
     const newPage = currentPage + 1
     if (currentPage !== maxPage) paginate(newPage)
-  }, [currentPage, maxPage])
+  }, [currentPage, maxPage, paginate])
   const select = useCallback<KeyEvent>((key, event) => {
     event.preventDefault()
 
@@ -240,7 +240,7 @@ const Trigger: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className }) 
     }
 
     setFocusIndex(num - 1)
-  }, [maxPage, paginate, baseLibraryRef, setFocusIndex])
+  }, [baseLibraryRef, setFocusIndex])
 
   const newWindow = useCallback<KeyEvent>((_, event) => {
     event.preventDefault()
@@ -248,21 +248,21 @@ const Trigger: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className }) 
       const partition = getModelElement(baseLibraryRef, focusIndex)
       clickAction(partition, '#ar-action-open')
     }
-  }, [focusIndex, getModelElement, clickAction])
+  }, [focusIndex])
   const copyClipboard = useCallback<KeyEvent>((_, event) => {
     event.preventDefault()
     if (focusIndex >= 0) {
       const partition = getModelElement(baseLibraryRef, focusIndex)
       clickAction(partition, '#ar-action-copy')
     }
-  }, [focusIndex, getModelElement, clickAction])
+  }, [focusIndex])
   const deleteSelect = useCallback<KeyEvent>((_, event) => {
     event.preventDefault()
     if (focusIndex >= 0) {
       const partition = getModelElement(baseLibraryRef, focusIndex)
       clickAction(partition, '#ar-action-delete')
     }
-  }, [focusIndex, getModelElement, clickAction])
+  }, [focusIndex])
   const popupPlay = useCallback<KeyEvent>((_, event) => {
     event.preventDefault()
     if (focusIndex >= 0) {
@@ -272,15 +272,19 @@ const Trigger: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className }) 
         container.click()
       }
     }
-  }, [focusIndex, getModelElement])
+  }, [focusIndex])
   const popupClose = useCallback<KeyEvent>((_, event) => {
     event.preventDefault()
-    playerSource && setPlayerSource(null)
+    if (playerSource) {
+      setPlayerSource(null)
+    }
   }, [playerSource, setPlayerSource])
 
-  useEffect(() => setBaseLibraryRef(baseLibraryRef), [baseLibraryRef.current])
+  useEffect(() => setBaseLibraryRef(baseLibraryRef), [baseLibraryRef, setBaseLibraryRef])
   useEffect(() => {
-    playerSource && toast('Tap outside the screen to exit the player.')
+    if (playerSource) {
+      toast('Tap outside the screen to exit the player.')
+    }
   }, [playerSource])
   useEffect(() => {
     for (let i = 0; i < perPage; i++) {
@@ -296,13 +300,13 @@ const Trigger: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className }) 
         blurModel(modelElement)
       }
     }
-  }, [focusIndex])
+  }, [focusIndex, perPage])
   useEffect(() => {
     if (currentPage > 1 && pageModels.length === 0) {
       const cpage = currentPage - 1
       paginate(cpage)
     }
-  }, [pageModels])
+  }, [pageModels, currentPage, paginate])
   useEffect(() => {
     setPageCount(Math.ceil(models.length / perPage))
     const incorrect = models.filter(model => nv(model))
@@ -316,13 +320,13 @@ const Trigger: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className }) 
         async function save() {
           await updateModels(
             models,
-            current?.id!)
+            current.id!)
         }
         save()
       } catch {}
     }
     paginate(currentPage)
-  }, [currentPage, models, perPage])
+  }, [current, currentPage, models, perPage, paginate, setModels, setPageCount])
 
   return (<>
     <KeyboardEventHandler handleKeys={['esc']} onKeyEvent={popupClose} />

@@ -47,25 +47,34 @@ async function request(url: string) {
 }
 
 function serialize(res: Response, namespace: string): Model {
-  const item = res?.items.pop()!
-  const snippet = item?.snippet!
-  const localized = snippet?.localized!
+  if (res) {
+    const item = res.items.pop()!
+    const snippet = item.snippet!
+    const localized = snippet.localized!
 
-  return {
-    provider: 'YouTube',
-    id: v5(v4(), namespace),
-    videoInfo: {
-      id: item!.id,
-      url: `https://youtu.be/${item!.id}`,
-      title: !localized ? snippet!.title : localized!.title,
-      description: !localized ? snippet!.description : localized!.description,
-      thumbnailUrl: snippet!.thumbnails.maxres.url,
-      publishedAt: snippet!.publishedAt,
-      params: {
-        name: snippet!.channelTitle,
-      }
-    },
-    createdAt: dayjs().unix(),
+    return {
+      provider: 'YouTube',
+      id: v5(v4(), namespace),
+      videoInfo: {
+        id: item!.id,
+        url: `https://youtu.be/${item!.id}`,
+        title: !localized ? snippet!.title : localized!.title,
+        description: !localized ? snippet!.description : localized!.description,
+        thumbnailUrl: snippet!.thumbnails.maxres.url,
+        publishedAt: snippet!.publishedAt,
+        params: {
+          name: snippet!.channelTitle,
+        }
+      },
+      createdAt: dayjs().unix(),
+    }
+  } else {
+    return {
+      provider: '',
+      id: '00000000-0000-0000-0000-000000000000',
+      videoInfo: {},
+      createdAt: 0,
+    }
   }
 }
 

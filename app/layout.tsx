@@ -24,7 +24,7 @@ import 'dayjs/locale/tr'
 import 'dayjs/locale/uk'
 import 'dayjs/locale/vi'
 import 'dayjs/locale/zh'
-
+import { LayoutProps } from '@/types/component'
 import './globals.css'
 
 dayjs.extend(localizedFormat)
@@ -37,7 +37,7 @@ const notoSans = Noto_Sans({
   display: 'fallback',
 })
 
-const RootLayout: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children }) => {
+export default function RootLayout({ children }: LayoutProps) {
   const [locale, setLocale] = useState('en')
   
   useEffect(() => setLocale(navigator.language), [])
@@ -46,7 +46,7 @@ const RootLayout: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children }
   }, [locale])
   
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html>
       <meta name='darkreader-lock' content='true' />
       <link rel='shortcut icon' href='/favicon.ico'></link>
       <link rel='apple-touch-icon' href='/apple-touch-icon.png'></link>
@@ -63,5 +63,3 @@ const RootLayout: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children }
     </html>
   )
 }
-
-export default RootLayout

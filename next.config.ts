@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     return config
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    // ignoreDuringBuilds: true,
   },
   reactStrictMode: true,
   devIndicators: {

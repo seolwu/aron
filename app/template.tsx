@@ -1,19 +1,24 @@
 'use client'
 
 import { useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { Poppins } from 'next/font/google'
 import ReactPlayer from 'react-player/lazy'
 import { AnimatePresence, motion } from 'motion/react'
 import ResponsivePagination from 'react-responsive-pagination'
 import { cssTransition, ToastContainer } from 'react-toastify'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { cn } from '@/utils'
+import { ControllerURLFormat, Providers } from '@/types'
 import { initalizeLib } from '@/lib'
 import { useGlobal } from '@/lib/context/GlobalContext'
-import BaseLibrary, { useLibrary } from '@/lib/context/LibraryContext'
-import Controller, { useController } from '@/lib/context/ControllerContext'
-import { cn } from '@/utils'
-import GlobalConstruct from '@/components/GlobalConstruct'
+import { useLibrary } from '@/lib/context/LibraryContext'
+import { useController } from '@/lib/context/ControllerContext'
 import 'animate.css'
+
+const BaseLibrary = dynamic(() => import('@/lib/context/LibraryContext'), { ssr: false })
+const Controller = dynamic(() => import('@/lib/context/ControllerContext'), { ssr: false })
+const GlobalConstruct = dynamic(() => import('@/components/GlobalConstruct'), { ssr: false })
 
 const poppins = Poppins({
   variable: '--poppins',
@@ -23,6 +28,7 @@ const poppins = Poppins({
 
 const Template: React.FC = () => {
   const { namespace, setNamespace, setProviders } = useGlobal()
+
   const {
     setLibraries, setCurrentLibrary,
     setLibraryModels,
@@ -37,11 +43,13 @@ const Template: React.FC = () => {
     urlformat, setURLFormat,
   } = useController()
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const constructChanged = ([k, v]: [string, any]) => {
-    if (k === 'namespace') setNamespace(v)
-    if (k === 'format') setURLFormat(v)
-    if (k === 'providers') setProviders(v)
+    if (k === 'namespace') setNamespace(v as string)
+    if (k === 'format') setURLFormat(v as ControllerURLFormat[])
+    if (k === 'providers') setProviders(v as Providers)
   }
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   // Initlize IndexedDB
   useEffect(() => {
@@ -54,7 +62,7 @@ const Template: React.FC = () => {
           setLibraryModels(sorted)
         }
       })
-  }, [])
+  }, [setCurrentLibrary, setLibraries, setLibraryModels, sortModels])
 
   return (<>
     <GlobalConstruct
@@ -135,7 +143,8 @@ const Template: React.FC = () => {
               </div>
             )}
           </AnimatePresence>
-          <Controller /> {/* URL Input */}
+          {/* URL Input */}
+          <Controller />
         </main>
         <aside className='absolute sm:relative flex-1'>
           {/* Toast */}

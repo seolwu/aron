@@ -1,9 +1,9 @@
 'use client'
 
 import { FocusEvent, RefObject, useCallback, useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import KeyboardEventHandler from 'react-keyboard-event-handler'
 import { CircleAlert, SendHorizonal } from 'lucide-react'
 import { cn } from '@/utils'
 import { useGlobal } from './GlobalContext'
@@ -14,15 +14,17 @@ import Button from '@/components/Button'
 import Format from '@/components/Format'
 import Tooltip from '@/components/Tooltip'
 
+const KeyboardEventHandler = dynamic(() => import('react-keyboard-event-handler'), { ssr: false })
+
 type State = {
-  controllerRef: RefObject<HTMLInputElement>
+  controllerRef: RefObject<HTMLInputElement | null>
   controllerTimeoutRef: RefObject<NodeJS.Timer | null>
   controllerState: boolean
   controllerGuideVisible: boolean
   cc: number
   untilCloseTime: number
   urlformat: ControllerURLFormat[]
-  setControllerRef: (ref: RefObject<any>) => void
+  setControllerRef: (ref: RefObject<HTMLInputElement | null>) => void
   setControllerTimeoutRef: (ref: RefObject<NodeJS.Timer | null>) => void
   setControllerState: (state: boolean) => void
   setControllerGuideVisible: (state: boolean) => void
@@ -75,21 +77,21 @@ const Controller: React.FC = () => {
   const controllerRef = useRef<HTMLInputElement>(null)
   const controllerTimeoutRef = useRef<NodeJS.Timer>(null)
 
-  function send() {
+  const send = useCallback(() => {
     const cRef = controllerRef
     if (!cRef) return
     
     if (cRef.current && providers) {
       validateInput(cRef.current, namespace, providers)
     }
-  }
+  }, [controllerRef, namespace, providers, validateInput])
 
   const controllerHandler = useCallback((event: FocusEvent<HTMLInputElement>) => {
     const focused = event.type === 'focus'
     const timeout = focused ? 0 : 250 // if it's a focus handle; set to 0(NO-DELAY), not 250(ms).
     const callback = (state: boolean) => setControllerState(state)
     setTimeout(() => callback(focused), timeout)
-  }, [setControllerState, setCC])
+  }, [setControllerState])
 
   const sendHandler = useCallback<KeyEvent>((_, event) => {
     event.preventDefault()
@@ -108,8 +110,8 @@ const Controller: React.FC = () => {
     setControllerState(false)
   }, [setControllerState])
   
-  useEffect(() => setControllerRef(controllerRef), [controllerRef.current])
-  useEffect(() => setControllerTimeoutRef(controllerTimeoutRef), [controllerTimeoutRef.current])
+  useEffect(() => setControllerRef(controllerRef), [controllerRef, setControllerRef])
+  useEffect(() => setControllerTimeoutRef(controllerTimeoutRef), [controllerTimeoutRef, setControllerTimeoutRef])
   useEffect(() => {
     if (!controllerState) {
       const tRef = controllerTimeoutRef
@@ -142,32 +144,7 @@ const Controller: React.FC = () => {
         clearInterval(tRef.current as unknown as number)
       }
     }
-
-    // if (!controllerState) {
-    //   setCC(0)
-    //   if (controllerTimeoutRef) {
-    //     clearTimeout(controllerTimeoutRef.current as unknown as number)
-    //   }
-    //   return
-    // } else {
-    //   controllerTimeoutRef.current = setInterval(() => {
-    //     if (cc >= untilCloseTime - 1) {
-    //       clearInterval(controllerTimeoutRef.current as unknown as number)
-    //       if (controllerRef.current) 
-    //         controllerRef.current.blur()
-    //       setCC(0)
-    //     } else {
-    //       setCC(cc + 1)
-    //     }
-    //   }, 1000)
-    // }
-
-    // return () => {
-    //   if (controllerTimeoutRef && controllerTimeoutRef.current) {
-    //     clearInterval(controllerTimeoutRef.current as unknown as number)
-    //   }
-    // }
-  }, [controllerState, cc, untilCloseTime])
+  }, [controllerState, cc, untilCloseTime, setControllerState, setCC])
 
   return (
     <div
@@ -200,7 +177,8 @@ const Controller: React.FC = () => {
                 ))}
               </code>
               <span className='opacity-50'>
-                <span className='px-0.5 mr-1 rounded-sm border border-on-background/20 text-xs'>//</span>
+                {/* &#47; = double-slash(//) */}
+                <span className='px-0.5 mr-1 rounded-sm border border-on-background/20 text-xs'>&#47;&#47;</span>
                 does not need to be included.
               </span>
             </div>

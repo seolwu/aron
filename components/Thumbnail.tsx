@@ -1,20 +1,8 @@
-import { useState, MouseEvent, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import { Swatch } from '@vibrant/color'
 import { cn, url2Image, imagePalette } from '@/utils'
-
-interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  [key: string]: any
-}
-
-interface ThumbnailProps {
-  src: string
-  alt: string
-  width: number
-  height: number
-  highPriority?: boolean
-  onInteract?: (event: MouseEvent<HTMLDivElement>) => void
-}
+import { Props, ThumbnailProps } from '@/types/component'
 
 const Thumbnail: React.FC<Props & ThumbnailProps> = ({
   id,

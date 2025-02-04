@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react'
 import { useEffect } from 'react'
 import { provideYouTube, YouTubeURLRegex, FileURLRegex, provideFileFormat } from '@/utils'
 import { Providers, ProviderCallback, ControllerURLFormat } from '@/types'
+import { ContructProps } from '@/types/component'
 
 type AronProperies = {
   namespace: string | undefined
@@ -18,16 +19,13 @@ type AronProperies = {
   __PROXY_INITIALIZED__: boolean
 }
 
+/* eslint-disable no-var */
 declare global {
   var __aron__: AronProperies
 }
+/* eslint-enable no-var */
 
-interface Props {
-  onChange?: ([k, v]: [string, any]) => void,
-  [key: string]: any
-}
-
-const GlobalConstruct: React.FC<Props> = ({ onChange, ...props }) => {
+const GlobalConstruct: React.FC<ContructProps> = ({ onChange, ...props }) => {
   const [namespace] = useState(props['prop-namespace'])
   const [format] = useState(props['prop-controller-format'])
 
@@ -53,6 +51,7 @@ const GlobalConstruct: React.FC<Props> = ({ onChange, ...props }) => {
             providers: null,
             format: null,
             add: {
+              /* eslint-disable @typescript-eslint/no-unused-expressions */
               provider(name, callback, expression) {
                 globalThis.__aron__.property.providers && (
                   globalThis.__aron__.property.providers[name] = { callback, expression }
@@ -63,6 +62,7 @@ const GlobalConstruct: React.FC<Props> = ({ onChange, ...props }) => {
                   globalThis.__aron__.property.format.push({ name, format })
                 )
               },
+              /* eslint-enable @typescript-eslint/no-unused-expressions */
             },
           },
           __PROXY_INITIALIZED__: false,
@@ -71,11 +71,13 @@ const GlobalConstruct: React.FC<Props> = ({ onChange, ...props }) => {
       
       if (!globalThis.__aron__.__PROXY_INITIALIZED__) {
         const handler = {
+          /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-expressions */
           set(target: any, prop: string, value: any) {
             onChange && onChange([prop, value])
             target[prop] = value
             return true
           }
+          /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-expressions */
         }
         globalThis.__aron__ = new Proxy(globalThis.__aron__, handler)
         globalThis.__aron__.namespace = namespace
@@ -87,7 +89,7 @@ const GlobalConstruct: React.FC<Props> = ({ onChange, ...props }) => {
         globalThis.__aron__.__PROXY_INITIALIZED__ = true
       }
     }
-  }, [globalThis.__aron__])
+  }, [defaultProviders, format, namespace, onChange])
 
   return (<></>)
 }
