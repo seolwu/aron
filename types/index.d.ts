@@ -1,6 +1,7 @@
 export { VideoInfo } from './video'
 export { ProvideData, Provider, Providers, ProviderCallback, ProviderFunctional } from './provider'
 export { thumbnail, thumbnails, Localized, Snippet, Item, Response } from './youtube'
+export { Props, ContructProps, LayoutProps, ThumbnailProps, ModelItemProps } from './component'
 
 export type Model = {
   provider: Provider

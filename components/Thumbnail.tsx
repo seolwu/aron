@@ -2,9 +2,9 @@ import { useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import { Swatch } from '@vibrant/color'
 import { cn, url2Image, imagePalette } from '@/utils'
-import { Props, ThumbnailProps } from '@/types/component'
+import { Props, ThumbnailProps } from '@/types'
 
-const Thumbnail: React.FC<Props & ThumbnailProps> = ({
+const Thumbnail: React.FC<Props<HTMLDivElement> & ThumbnailProps> = ({
   id,
   src,
   alt,

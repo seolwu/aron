@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { cn } from '@/utils'
-import { Props } from '@/types/component'
+import { Props } from '@/types'
 
 interface TooltipProps {
   tooltip: React.ReactNode
   position?: 'left' | 'top' | 'right' | 'bottom' | 'custom'
 }
 
-const Tooltip: React.FC<Props & TooltipProps> = ({
+const Tooltip: React.FC<Props<HTMLDivElement> & TooltipProps> = ({
   children,
   tooltip,
   position = 'bottom',

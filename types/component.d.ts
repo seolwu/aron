@@ -1,11 +1,11 @@
 import { Model } from '@/types'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface Props extends React.HTMLAttributes<HTMLDivElement> {
+export interface Props<T extends HTMLElement> extends React.HTMLAttributes<T> {
   [key: string]: any
 }
 
-interface ContructProps extends Props {
+interface ContructProps<T extends HTMLElement> extends Props<T> {
   onChange?: ([k, v]: [string, any]) => void
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */

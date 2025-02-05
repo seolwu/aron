@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react'
 import { useEffect } from 'react'
 import { provideYouTube, YouTubeURLRegex, FileURLRegex, provideFileFormat } from '@/utils'
 import { Providers, ProviderCallback, ControllerURLFormat } from '@/types'
-import { ContructProps } from '@/types/component'
+import { ContructProps } from '@/types'
 
 type AronProperies = {
   namespace: string | undefined
@@ -25,7 +25,7 @@ declare global {
 }
 /* eslint-enable no-var */
 
-const GlobalConstruct: React.FC<ContructProps> = ({ onChange, ...props }) => {
+const GlobalConstruct: React.FC<ContructProps<HTMLDivElement>> = ({ onChange, ...props }) => {
   const [namespace] = useState(props['prop-namespace'])
   const [format] = useState(props['prop-controller-format'])
 
